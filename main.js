@@ -5,15 +5,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const scoreDisplay = document.querySelector(".score-display")
     const linesDisplay = document.querySelector(".line-display")
     const grid = document.querySelector(".grid")
-    const displaySquares = document.querySelector('.previous-grid div')
+    const displaySquares = document.querySelectorAll('.previous-grid div')
     const width = 10
     const height = 20
-    const squares = Array.from(grid.querySelectorAll('div'))
-    const currentRotation = 0
+    let squares = Array.from(grid.querySelectorAll('div'))
+    let currentRotation = 0
     let timerId
     let score = 0
     let lines = 0
-
+    let nextRandom = 0
+    let currentIndex = 0
 
 
     function control(e) { // create a function to cotrol tetros and attch functions e=== event
@@ -24,11 +25,11 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (e.KeyCode === 37) {
             moveLeft()
         } else if (e.KeyCode === 40) {
-            moveDown
+            moveDown()
         }
     }
 
-    document.addEventListener('keydown', control) // move the tetro down faster if wanted
+    document.addEventListener('keyup', control) // move the tetro down faster if wanted
 
 
     // get the Tetrominos and gtoup in 1 variable
@@ -73,16 +74,18 @@ document.addEventListener("DOMContentLoaded", () => {
     ]
 
     // make a way to select tetros randomly
-    const random = Math.floor(Math.random() * allTetros.length)
-    const rotation = 0
-    const current = allTetros[random][rotation]
+    let random = Math.floor(Math.random() * allTetros.length)
+        //const currentRotation = 0
+    const current = allTetros[random][currentRotation]
 
     // find a way to make the tets drop down
 
-    const currentPosition = 4
+    let currentPosition = 4
         // create a function that shapes each square
     function draw() {
-        current.forEach(index => (squares[currentPosition * index].classList.add('block')))
+        current.forEach(index => {
+            squares[currentPosition + index].classList.add('block')
+        })
     }
 
 
@@ -104,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function moveRight() { // write a function that prevents collisions moving right
         undraw()
-        const rightEdge = current.some(index => (currentPosition + index) % width === 0)
+        const rightEdge = current.some(index => (currentPosition + index) % width === width - 1)
         if (!rightEdge) currentPosition += 1
         if (current.some(index => squares[currentPosition + index].classList.contains('block2'))) {
             currentPosition -= 1
@@ -116,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function moveLeft() { // create a function to move tetro left
         undraw()
         const leftEdge = current.some(index => (currentPosition + index) % width === 0)
-        if (leftEdge) currentPosition -= 1
+        if (!leftEdge) currentPosition -= 1
         if (current.some(index => squares[currentPosition + index].classList.contains('block2'))) {
             currentPosition += 1
         }
@@ -137,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
     }
-    // may need freeze()
+    freeze()
 
     startBtn.addEventListener('click', () => {
         if (timerId) {
@@ -160,9 +163,10 @@ document.addEventListener("DOMContentLoaded", () => {
         current = allTetros[random][currentRotation]
         draw()
     }
+    //draw()
 
     function gameOver() {
-        if (current.some(index => squares[currentPosition + index].classList.add.contains('block2'))) {
+        if (current.some(index => squares[currentPosition + index].classList.contains('block2'))) {
             scoreDisplay.innerHTML = 'end'
             clearInterval(timerId)
         }
@@ -172,6 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const displayWidth = 4
         //const displaySquares = document.querySelectorAll('.previous-grid div')
     const displayIndex = 0
+
     const smallTetros = [
         [1, displayWidth + 1, displayWidth * 2 + 1, 2], /* lTetromino */
         [0, displayWidth, displayWidth + 1, displayWidth * 2 + 1], /* zTetromino */
@@ -183,13 +188,14 @@ document.addEventListener("DOMContentLoaded", () => {
     function displayShape() {
         displaySquares.forEach(square => {
             square.classList.remove('block')
-            square.style.backgroundImage = 'none'
+                //square.style.backgroundImage = 'none'
         })
         smallTetros[nextRandom].forEach(index => {
             displaySquares[displayIndex + index].classList.add('block')
-            displaySquares[displayIndex + index].style.backgroundImage = colors[nextRandom]
+                //displaySquares[displayIndex + index].style.backgroundImage = colors[nextRandom]
         })
     }
+
 
     function addScore() {
         for (currentIndex = 0; currentIndex < 199; currentIndex += width) {
@@ -200,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 scoreDisplay.innerHTML = score
                 linesDisplay.innerHTML = lines
                 row.forEach(index => {
-                        squares[index].style.backgroundImage = 'none'
+                        //squares[index].style.backgroundImage = 'none'
                         squares[index].classList.remove('block2') || squares[index].classList.remove('block')
 
                     })
